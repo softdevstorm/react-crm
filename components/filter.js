@@ -2,17 +2,17 @@ import React, { Fragment } from 'react';
 import { useRouter } from "next/router";
 import DatePicker from "react-datepicker";
 import Select from 'react-select';
-import { weekListOption, yearListOption, getWeekNumber, getYear, formatDate } from '../lib/utils/date';
+import { weekListOption, yearListOption, getWeekNumber, getYear, formatDate, getCurrentDate } from '../lib/utils/date';
 import { getCompanies, getCustomerGroups } from '../lib/api';
 import { getProfile } from '../lib/auth';
 import { connect } from "react-redux";
 
 import {
-    setCompanyId, 
+    setCompanyId,
     setCustomerGroupId, 
-    setWeek, 
-    setYear, 
-    setStartDate, 
+    setWeek,
+    setYear,
+    setStartDate,
     setEndDate
 } from '../lib/store/action/filter';
 
@@ -119,7 +119,7 @@ const FilterByWeekCmp = (props) => {
     )
 };
 
-const mapStateToProps = (state) => {
+const mapWeekStateToProps = (state) => {
     return {
         companyId: state.filter.companyId,
         customerGroupId: state.filter.customerGroupId,
@@ -128,14 +128,9 @@ const mapStateToProps = (state) => {
     }
 }
 
-export const FilterByWeek = connect(mapStateToProps)(FilterByWeekCmp)
+export const FilterByWeek = connect(mapWeekStateToProps)(FilterByWeekCmp)
 
-export const FilterByDate = ({
-        companyChange,
-        customerGroupChange,
-        startDateChange,
-        endDateChange
-    }) => {
+const FilterByDateCmp = (props) => {
     // const {selectedHub} = props;
     // console.log(selectedHub);
     const router = useRouter()
@@ -145,13 +140,13 @@ export const FilterByDate = ({
     const [companyOptions, setCompanyOptions] = React.useState([])
     const [customerGroupOptions, setCustomerGroupOptions] = React.useState([])
 
-    const [startDate, setStartDate] = React.useState(new Date('2020-01-01'));
-    const [endDate, setEndDate] = React.useState(new Date());
-
     const [selectedCompany, setCompany] = React.useState({company_id: null})
     const [selectedCustomerGroup, setCustomerGroup] = React.useState({customer_group_id: null})
-    const [selectedStartDate, setSelectedStartDate] = React.useState({start_date: formatDate(startDate)})
-    const [selectedEndDate, setSelectedEndDate] = React.useState({end_date: formatDate(endDate)})
+
+    const [selectedStartDate, setSelectedStartDate] = React.useState(getYear() + '-01-01');
+    const [selectedEndDate, setSelectedEndDate] = React.useState(getCurrentDate());
+
+    const {companyId, customerGroupId, startDate, endDate, dispatch} = props;
 
     React.useEffect(() => {
         const accountId = getProfile().id;
@@ -191,15 +186,21 @@ export const FilterByDate = ({
     }, [])
 
     let handleChange = (value, type) => {
-        if ( type === 'company' )  setCompany({company_id: value});
-        if ( type === 'customer' ) setCustomerGroup({customer_group_id: value});
+        if ( type === 'company' ) {
+            setCompany({company_id: value});
+            dispatch(setCompanyId(value));
+        }
+        if ( type === 'customer' ) {
+            setCustomerGroup({customer_group_id: value});
+            dispatch(setCustomerGroupId(value));
+        }
         if ( type === 'startDate' ) {
-            setStartDate(value);
-            setSelectedStartDate({start_date: formatDate(value)});
+            setSelectedStartDate(formatDate(value));
+            dispatch(setStartDate(formatDate(value)));
         }
         if ( type === 'endDate' ) {
-            setEndDate(value)
-            setSelectedEndDate({end_date: formatDate(value)});
+            setSelectedEndDate(formatDate(value));
+            dispatch(setEndDate(formatDate(value)));
         }
     }
 
@@ -207,12 +208,12 @@ export const FilterByDate = ({
         <Fragment>
             <DatePicker 
                 showPopperArrow={false}
-                selected={endDate}
+                selected={new Date(selectedEndDate)}
                 onChange={(date) => handleChange(date, 'endDate')}
             />
             <DatePicker
                 showPopperArrow={false}
-                selected={startDate}
+                selected={new Date(selectedStartDate)}
                 onChange={(date) => handleChange(date, 'startDate')}
             />
             { pathName.includes('traffic') ? ('') : (
@@ -232,3 +233,14 @@ export const FilterByDate = ({
         </Fragment>
     )
 };
+
+const mapDateStateToProps = (state) => {
+    return {
+        companyId: state.filter.companyId,
+        customerGroupId: state.filter.customerGroupId,
+        startDate: state.filter.startDate,
+        endDate: state.filter.endDate
+    }
+}
+
+export const FilterByDate = connect(mapDateStateToProps)(FilterByDateCmp)

@@ -93,6 +93,7 @@ const OverView = (props) => {
         </Layout>
     );
 };
+
 const mapStateToProps = (state) => {
     return {
         companyId: state.filter.companyId,
@@ -101,4 +102,5 @@ const mapStateToProps = (state) => {
         year: state.filter.year
     }
 }
+
 export default connect(mapStateToProps)(OverView);
