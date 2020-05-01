@@ -93,13 +93,13 @@ const FilterByWeekCmp = (props) => {
         <Fragment>
             <Select
                 instanceId="yearSelect"
-                defaultValue={yearOptions.filter(option => option.label === currentYear)}
+                defaultValue={yearOptions.filter(option => option.value === currentYear)}
                 placeholder={<div>Select a Year</div>}
                 options={yearOptions}
                 onChange={(opt) => handleChange(opt.value, 'year')} />
             <Select
                 instanceId="weekSelect"
-                defaultValue={weekOptions.filter(option => option.label === currentWeek)}
+                defaultValue={weekOptions.filter(option => option.value === currentWeek)}
                 placeholder={<div>Select a Week</div>}
                 options={weekOptions}
                 onChange={(opt) => handleChange(opt.value, 'week')} />

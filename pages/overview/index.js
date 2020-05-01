@@ -38,6 +38,8 @@ const OverView = (props) => {
                 setMessages(resMessages)
                 if (resMessages.length > 0) {
                     setDataAvailable(true);
+                } else {
+                    setDataAvailable(false);
                 }
             })
             .catch(error => {

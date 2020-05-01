@@ -51,11 +51,9 @@ class MyApp extends App {
   render() {
       const {Component, pageProps} = this.props;
       return (
-        <Container>
-          <Provider store={this.store}>
-            <Component {...pageProps} />
-          </Provider>
-        </Container>
+        <Provider store={this.store}>
+          <Component {...pageProps} />
+        </Provider>
       );
   }
 
