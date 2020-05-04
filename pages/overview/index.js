@@ -8,10 +8,11 @@ import DayWeekChart from '../../lib/charts/day-week-chart';
 import CategoryChart from '../../lib/charts/category-chart';
 import PromotionChart from '../../lib/charts/promotion-chart';
 import SlickSliderWithImage from '../../lib/utils/slick-slider';
+import { setCompany } from '../../lib/store/action/filter';
 
 const OverView = (props) => {
-    const [company, setCompany] = React.useState(null);
-    const {companyId, customerGroupId, week, year} = props;
+    const {companyId, customerGroupId, week, year, dispatch} = props;
+    const [selectedcompany, setSelectedCompany] = React.useState(null);
     const [sid, setSid] = React.useState(0);
     const [dataAvailable, setDataAvailable] = React.useState(false);
     const [messages, setMessages] = React.useState([]);
@@ -30,7 +31,8 @@ const OverView = (props) => {
         if ((companyId || companyId === 0) && (customerGroupId || customerGroupId === 0) && week && year) {
             getData(companyId, customerGroupId, week, year, id)
             .then(data => {
-                setCompany(data.data.company);
+                setSelectedCompany(data.data.company);
+                dispatch(setCompany(data.data.company));
                 setTotalCount(data.data.count);
                 setStartDate(data.data.start_date);
                 setEndDate(data.data.end_date);
@@ -49,7 +51,7 @@ const OverView = (props) => {
         }
     }, [year, week, companyId, customerGroupId])
 
-    return ( 
+    return (
         <Layout title={'Overview'}>
             {dataAvailable ? ( 
                 <div className="data-content">
@@ -100,7 +102,8 @@ const mapStateToProps = (state) => {
         companyId: state.filter.companyId,
         customerGroupId: state.filter.customerGroupId,
         week: state.filter.week,
-        year: state.filter.year
+        year: state.filter.year,
+        company: state.filter.company
     }
 }
 

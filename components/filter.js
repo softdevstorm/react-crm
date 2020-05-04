@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import { useRouter } from "next/router";
+import { connect } from "react-redux";
 import DatePicker from "react-datepicker";
 import Select from 'react-select';
 import { weekListOption, yearListOption, getWeekNumber, getYear, formatDate, getCurrentDate } from '../lib/utils/date';
 import { getCompanies, getCustomerGroups } from '../lib/api';
 import { getProfile } from '../lib/auth';
-import { connect } from "react-redux";
 
 import {
     setCompanyId,

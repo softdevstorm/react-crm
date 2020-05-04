@@ -15,9 +15,6 @@ const Layout = ({
     const router = useRouter()
     const pathName = router.pathname.replace('/', '');
 
-    React.useEffect(() => {
-    })
-
     return (
         <main className="mainContainer">
             <Head>
