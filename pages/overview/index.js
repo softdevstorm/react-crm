@@ -37,6 +37,7 @@ const OverView = (props) => {
                 let resMessages = data.data.messages;
                 setMessages(resMessages)
                 if (resMessages.length > 0) {
+                    localStorage.setItem('messages', JSON.stringify(resMessages));
                     setDataAvailable(true);
                 } else {
                     setDataAvailable(false);

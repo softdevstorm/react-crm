@@ -208,7 +208,7 @@ img {
         background: #fff;
         border-radius: 50%;
         padding: 5px;
-        margin-top: 2px;
+        margin-top: 5px;
     }
 }
 
@@ -488,5 +488,169 @@ img {
 
     .thumbnail-item:hover {
         box-shadow: 0 0 0 1px #000;
+    }
+}
+
+// message and upload modal style
+.message-modal {
+    .modal-dialog {
+        max-width: 900px !important;
+        .modal-header {
+            border-bottom: none;
+            height: 60px;
+            font-weight: 700;
+            padding-top: 18px;
+            .download-btn {
+                text-align: center;
+                display: block;
+                position: absolute;
+                left: 18px;
+                top: 17px;
+                background: #0071fe;
+                padding: 5px 15px;
+                font-size: 13px;
+                color: #fff;
+                font-weight: 500;
+                border-radius: 3px;
+                i {
+                    font-size: 1rem;
+                    color: #fff;
+                    font-weight: 600;
+                }
+            }
+            a.download-btn {
+                text-decoration: none !important;
+            }
+        }
+
+        .modal-body {
+            // .modal-column-left {
+            //     width: 70%;
+            //     padding-right: 1.5rem;
+            // }
+            .nav .nav-item {
+                width: 33.33333333%;
+                text-align: center;
+                .nav-link {
+                    color: #000;
+                    border: 0.05rem solid #efefef;
+                }
+                .nav-link.active {
+                    color: #fff !important;
+                    border: 0.05rem solid #efefef;
+                }
+            }
+
+            .tab-detail-content {
+                padding: 20px 0;
+                #modal-desktop-image {
+                    width: 100%;
+                }
+            }
+
+            .tab-detail-content.image-tab {
+                text-align: center;
+            }
+
+            .modal-source-html {
+                height: 450px !important;
+                user-select: none;
+            }
+
+            .sort-select {
+                .form-group {
+                    display: inline-flex;
+                    float: right;
+                    .form-label {
+                        padding: 7px 0;
+                        margin-right: 0.5rem !important;
+                    }
+                }
+            }
+
+            input.form-control {
+                width: 100%;
+            }
+
+            .separate-line {
+                border-bottom: 1px solid #6b7682;
+                opacity: 0.2;
+            }
+
+            .nav-item.nav-link {
+                width: 33.33333333%;
+                text-align: center;
+                border: none !important;
+                color: #6b7682 !important;
+                font-size: 11px;
+                font-weight: 800;
+                width: 50%;
+
+                &:focus, &:active{
+                    border: 0px;
+                    outline: 0px;
+                }
+            }
+
+            .nav-item.nav-link:hover {
+                background: #fbfbfb;
+                transition: 0.5s;
+            }
+
+            .nav-item.nav-link.active {
+                background: transparent !important;
+                color: #000000 !important;
+                border-bottom: 2px solid #0071fe !important;
+                width: 50%;
+            }
+
+            .message-detail {
+                .tab-pane {
+                    margin-top: 1.5rem;
+                    font-size: 14px;
+                    .modal-company-logo {
+                        user-select: none;
+                        width: 50px;
+                        height: 30px;
+                        object-fit: contain;
+                        margin-right: .5rem;
+                    }
+                    .modal-company-name {
+                        font-size: 16px;
+                        font-weight: bold;
+                    }
+                    .list-group {
+                        width: 100%;
+                        .list-group-item {
+                            border: none;
+                            padding: 15px 0;
+                            .custom-checkbox .custom-control-label::before {
+                                width: 28px;
+                                height: 28px;
+                                margin-left: -5px;
+                                cursor: pointer;
+                            }
+                            .custom-control-label::after {
+                                width: 28px;
+                                height: 28px;
+                                margin-left: -5px;
+                                cursor: pointer;
+                            }
+                            .list-created-date {
+                                display: none;
+                            }
+
+                            button.btn {
+                                margin-top: 3px;
+                            }
+                        }
+                    } 
+                }
+            }
+
+            .create-list-form .col {
+                padding: 0;
+            }
+        }
     }
 }
