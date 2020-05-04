@@ -648,8 +648,19 @@ img {
                 }
             }
 
-            .create-list-form .col {
-                padding: 0;
+            .create-list-form {
+                .col {
+                    padding: 0;
+                }
+
+                .error {
+                    color: red;
+                }
+            }
+
+            .api-loading {
+                text-align: center;
+                margin-top: 100px;
             }
         }
     }
