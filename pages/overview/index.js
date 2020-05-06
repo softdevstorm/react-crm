@@ -5,13 +5,14 @@ import { getData } from '../../lib/api';
 import { getProfile } from '../../lib/auth';
 import WeekChart from '../../lib/charts/weekbarchart';
 import DayWeekChart from '../../lib/charts/day-week-chart';
+import DayWeekCompareChart from '../../lib/charts/day-week-compare-chart';
 import CategoryChart from '../../lib/charts/category-chart';
 import PromotionChart from '../../lib/charts/promotion-chart';
 import SlickSliderWithImage from '../../lib/utils/slick-slider';
 import { setCompany } from '../../lib/store/action/filter';
 
 const OverView = (props) => {
-    const {companyId, customerGroupId, week, year, dispatch} = props;
+    const {companyId, customerGroupId, week, year, compareData, compareCompanyIds, dispatch} = props;
     const [selectedcompany, setSelectedCompany] = React.useState(null);
     const [sid, setSid] = React.useState(0);
     const [dataAvailable, setDataAvailable] = React.useState(false);
@@ -19,11 +20,17 @@ const OverView = (props) => {
     const [startDate, setStartDate] = React.useState('');
     const [endDate, setEndDate] = React.useState('');
     const [totalCount, setTotalCount] = React.useState('');
+    const [compareMessages, setCompareMessages] = React.useState([]);
+    const [companyIds, setCompanyIds] = React.useState([]);
 
     React.useEffect(() => {
         const id = getProfile().id;
         setSid(id);
     }, [])
+
+    React.useEffect(() => {
+        setCompanyIds([]);
+    }, [messages])
 
     React.useEffect(() => {
         const id = getProfile().id;
@@ -51,6 +58,15 @@ const OverView = (props) => {
         }
     }, [year, week, companyId, customerGroupId])
 
+    // React.useEffect(() => {
+    //     setCompareMessages(compareData);
+    // }, [compareData])
+
+    React.useEffect(() => {
+        setCompanyIds(compareCompanyIds);
+        setCompareMessages(compareData);
+    }, [compareCompanyIds])
+
     return (
         <Layout title={'Overview'}>
             {dataAvailable ? ( 
@@ -66,13 +82,17 @@ const OverView = (props) => {
                             </div>
                         </div>
                         <div className="week-chart col-9">
-                            <WeekChart messages={messages} />
+                            <WeekChart messages={messages} compareMessages={compareMessages} companyIds={companyIds}/>
                         </div>
                     </div>
                     <div className="multi-chart-container">
                         <div className="col-4">
                             <div className="apex-chart">
-                                <DayWeekChart messages={messages} />
+                                {companyIds.length > 0? (
+                                    <DayWeekCompareChart compareMessages={compareMessages} companyIds={companyIds} />
+                                ) : (
+                                    <DayWeekChart messages={messages} />
+                                )}
                             </div>
                         </div>
                         <div className="col-4">
@@ -103,7 +123,9 @@ const mapStateToProps = (state) => {
         customerGroupId: state.filter.customerGroupId,
         week: state.filter.week,
         year: state.filter.year,
-        company: state.filter.company
+        company: state.filter.company,
+        compareData: state.filter.compareData,
+        compareCompanyIds: state.filter.compareCompanyIds
     }
 }
 

@@ -4,10 +4,11 @@ import { useRouter } from "next/router";
 import { Modal, Tab, Col, Row, Nav, Tabs, Form, ListGroup, Button } from 'react-bootstrap';
 import { FilterByWeek, FilterByDate } from './filter';
 import { getProfile } from '../lib/auth';
-import { getCompanies, getCustomerGroups } from '../lib/api';
+import { getCompanies, getCustomerGroups, getCompareMessages } from '../lib/api';
+import { setCompareData, setCompareCompanyIds } from '../lib/store/action/filter';
 
 const SubHeader = (props) => {
-    const {companyId, company, dispatch} = props;
+    const {companyId, company, week, year, compareData, compareCompanyIds, dispatch} = props;
     const router = useRouter()
     const pathName = router.pathname.replace('/', '');
     const [showModal, setShowModal] = useState(false);
@@ -15,6 +16,8 @@ const SubHeader = (props) => {
     const [compareCompanies, setcompareCompanies] = useState([]);
     const [selectCompany, setSelectCompany] = useState(false);
     const [selectedCompanyIds, setSelectedCompanyIds] = useState([]);
+    const [selectedCompareCompany, setSelectedCompareCompany] = useState(null);
+    // const [selectedCompareCompanies, setSelectedCompareCompanies] = useState([]);
     
     React.useEffect(() => {
         // let tempIdsOfSelectedCompanies = [...selectedCompanyIds];
@@ -24,9 +27,9 @@ const SubHeader = (props) => {
 
     const opencompareCompaniesModal = () => {
         setShowModal(true);
-        let tempIdsOfSelectedCompanies = [];
-        tempIdsOfSelectedCompanies.push(companyId);
-        setSelectedCompanyIds(tempIdsOfSelectedCompanies);
+        // let tempIdsOfSelectedCompanies = [];
+        // tempIdsOfSelectedCompanies.push(companyId);
+        // setSelectedCompanyIds(tempIdsOfSelectedCompanies);
         const accountId = getProfile().id;
         getCompanies(accountId)
         .then(data => {
@@ -37,9 +40,49 @@ const SubHeader = (props) => {
     }
 
     const addCompareCompany = () => {
-        const tempCom = companies.filter(company => !selectedCompanyIds.includes(company.id) && company.id != 0);
+        const tempCom = companies.filter(company => !selectedCompanyIds.includes(company.id) && company.id != 0 && company.id != companyId);
         setcompareCompanies(tempCom);
         setSelectCompany(true);
+    }
+
+    const selecteCompareCompany = (compareCid)  => {
+        if (parseInt(compareCid))
+        setSelectedCompareCompany(parseInt(compareCid));
+    }
+
+    const setSelectedCompareCompanyId = () => {
+        if (selectedCompareCompany) {
+            if (selectedCompanyIds.length >= 5) {
+                alert('Limit is over');
+                setSelectCompany(false);
+                return false;
+            }
+            let tempIdListOfSelectedCompareCompanies = [...selectedCompanyIds];
+            tempIdListOfSelectedCompareCompanies.push(selectedCompareCompany);
+            setSelectedCompanyIds(tempIdListOfSelectedCompareCompanies)
+            setSelectedCompareCompany(null);
+            setSelectCompany(false);
+        }
+    }
+
+    const compareCompanyData = () => {
+        let apiData = [...selectedCompanyIds];
+        apiData.unshift(companyId);
+        const accountId = getProfile().id;
+        getCompareMessages(accountId, apiData, week, year)
+        .then(data => {
+            data = JSON.parse(data)
+            if (data.status === 'success') {
+                dispatch(setCompareData(data.data.data));
+                dispatch(setCompareCompanyIds(selectedCompanyIds));
+                hideModal();
+            } else {
+                console.log(data.message);
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        })
     }
 
     const hideModal = () => {
@@ -47,13 +90,8 @@ const SubHeader = (props) => {
         setSelectedCompanyIds([]);
         setcompareCompanies([]);
         setSelectCompany(false);
-        let tempIdsOfSelectedCompanies = [];
-        tempIdsOfSelectedCompanies.push(companyId);
-        setSelectedCompanyIds(tempIdsOfSelectedCompanies);
+        setSelectedCompanyIds([]);
     }
-
-    console.log(selectedCompanyIds);
-    console.log(compareCompanies);
 
     return (
         <div className="row sub-top-bar">
@@ -99,35 +137,43 @@ const SubHeader = (props) => {
                 </Modal.Header>
                 <Modal.Body>
                     <Row>
-                        <Col className="col-9">
-                            {compareCompanies.map((company) => {
-                                <div className="added-companies">
-                                    <div className="company-logo">
-                                        <a href={company.website}><img src={company.logo} />
-                                        </a>
+                        <Col className="col-8">
+                            {selectedCompanyIds.map((cid) => {
+                                return (
+                                    <div className="added-companies" key={cid}>
+                                        <div className="company-logo">
+                                            {companies.filter(company => company.id === cid)[0].name}
+                                        </div>
                                     </div>
-                                    <div className="company-name">{company.name}</div>
-                                </div>
+                                )
                             })}
                             <div className="add-company-link">
                                 <a href="#" onClick={() => addCompareCompany()}>Add New Company to Compare</a>
                             </div>
                         </Col>
-                        <Col className="col-3">
+                        <Col className="col-4 select-companies">
                             {selectCompany ? (
-                                <Form className="select-compare-company">
-                                    <Form.Group controlId="compareForm.SelectCustom">
-                                        <Form.Control as="select">
-                                            {compareCompanies.map((company) => {
-                                                return (<option value={company.id} key={company.id}>{company.name}</option>)
-                                            })}
-                                        </Form.Control>
-                                    </Form.Group>
-                                </Form>
+                                <React.Fragment>
+                                    <Form className="select-compare-company">
+                                        <Form.Group controlId="compareForm.SelectCustom">
+                                            <Form.Control as="select" onChange={(e) => selecteCompareCompany(e.target.value)}>
+                                                <option value="0">Select a Company</option>
+                                                {compareCompanies.map((company) => {
+                                                    return (<option value={company.id} key={company.id}>{company.name}</option>)
+                                                })}
+                                            </Form.Control>
+                                        </Form.Group>
+                                    </Form>
+                                    <Button variant="success" onClick={() => setSelectedCompareCompanyId()}>Add this company</Button>{' '}
+                                </React.Fragment>
                             ) : (null)}
                         </Col>
                     </Row>
                 </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={hideModal}>Cancel</Button>
+                    <Button variant="success" onClick={compareCompanyData}>Compare</Button>
+                </Modal.Footer>
             </Modal>
         </div>
     )
@@ -135,8 +181,12 @@ const SubHeader = (props) => {
 
 const mapStateToProps = (state) => {
     return {
+        week: state.filter.week,
+        year: state.filter.year,
         companyId: state.filter.companyId,
-        company: state.filter.company
+        company: state.filter.company,
+        compareData: state.filter.compareData,
+        compareCompanyIds: state.filter.compareCompanyIds
     }
 }
 
