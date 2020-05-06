@@ -4,11 +4,11 @@ import { useRouter } from "next/router";
 import { Modal, Tab, Col, Row, Nav, Tabs, Form, ListGroup, Button } from 'react-bootstrap';
 import { FilterByWeek, FilterByDate } from './filter';
 import { getProfile } from '../lib/auth';
-import { getCompanies, getCustomerGroups, getCompareMessages } from '../lib/api';
+import { getCompanies, getCustomerGroups, getCompareMessagesByWeek, getCompareMessagesByDateRange } from '../lib/api';
 import { setCompareData, setCompareCompanyIds } from '../lib/store/action/filter';
 
 const SubHeader = (props) => {
-    const {companyId, customerGroupId, company, week, year, compareData, compareCompanyIds, dispatch} = props;
+    const {companyId, customerGroupId, company, week, year, startDate, endDate, compareData, compareCompanyIds, dispatch} = props;
     const router = useRouter()
     const pathName = router.pathname.replace('/', '');
     const [showModal, setShowModal] = useState(false);
@@ -17,21 +17,19 @@ const SubHeader = (props) => {
     const [selectCompany, setSelectCompany] = useState(false);
     const [selectedCompanyIds, setSelectedCompanyIds] = useState([]);
     const [selectedCompareCompany, setSelectedCompareCompany] = useState(null);
-    // const [selectedCompareCompanies, setSelectedCompareCompanies] = useState([]);
     
     React.useEffect(() => {
         if (compareData) {
             dispatch(setCompareData(null));
             dispatch(setCompareCompanyIds(null));
         }
-    }, [companyId, customerGroupId, week, year])
+    }, [companyId, customerGroupId, week, year, startDate, endDate])
 
     const opencompareCompaniesModal = () => {
         setShowModal(true);
         let accountCompanies = localStorage.getItem('accountCompanies');
         setCompanies(JSON.parse(accountCompanies));
         setSelectedCompanyIds([]);
-        // dispatch(setCompareData(null));
     }
 
     const addCompareCompany = () => {
@@ -66,20 +64,39 @@ const SubHeader = (props) => {
         let apiData = [...selectedCompanyIds];
         apiData.unshift(companyId);
         const accountId = getProfile().id;
-        getCompareMessages(accountId, apiData, customerGroupId, week, year)
-        .then(data => {
-            data = JSON.parse(data)
-            if (data.status === 'success') {
-                dispatch(setCompareData(data.data.data));
-                dispatch(setCompareCompanyIds(apiData));
-                hideModal();
-            } else {
-                console.log(data.message);
-            }
-        })
-        .catch(error => {
-            console.log(error);
-        })
+
+        if (week && year) {
+            getCompareMessagesByWeek(accountId, apiData, customerGroupId, week, year)
+            .then(data => {
+                data = JSON.parse(data)
+                if (data.status === 'success') {
+                    dispatch(setCompareData(data.data.data));
+                    dispatch(setCompareCompanyIds(apiData));
+                    hideModal();
+                } else {
+                    console.log(data.message);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
+        } else if (startDate && endDate) {
+            if (!customerGroupId) customerGroupId = 0;
+            getCompareMessages(accountId, apiData, customerGroupId, startDate, endDate)
+            .then(data => {
+                data = JSON.parse(data)
+                if (data.status === 'success') {
+                    dispatch(setCompareData(data.data.data));
+                    dispatch(setCompareCompanyIds(apiData));
+                    hideModal();
+                } else {
+                    console.log(data.message);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
+        }
     }
 
     const hideModal = () => {
@@ -88,9 +105,6 @@ const SubHeader = (props) => {
         setSelectCompany(false);
         // setSelectedCompanyIds([]);
     }
-
-    console.log(compareData);
-    console.log(compareCompanyIds);
 
     return (
         <div className="row sub-top-bar">
@@ -195,6 +209,8 @@ const mapStateToProps = (state) => {
     return {
         week: state.filter.week,
         year: state.filter.year,
+        startDate: state.filter.startDate,
+        endDate: state.filter.endDate,
         companyId: state.filter.companyId,
         customerGroupId: state.filter.customerGroupId,
         company: state.filter.company,

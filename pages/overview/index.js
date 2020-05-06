@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { connect } from 'react-redux';
+import { ListGroup } from 'react-bootstrap';
 import Layout from '../../components/layout';
 import { getData } from '../../lib/api';
 import { getProfile } from '../../lib/auth';
@@ -73,16 +74,30 @@ const OverView = (props) => {
             {dataAvailable ? ( 
                 <div className="data-content">
                     <div className="weekchart-container">
-                        <div className="touchpoint-counts col-3">
-                            <div>
-                                <span id="t_count">{totalCount}</span>
-                                <br />
-                                <span className="text">TOUCHPOINTS</span>
-                                <br />
-                                <span className="date-range">{`${startDate} - ${endDate}`}</span>
-                            </div>
+                        <div className="touchpoint-counts align-self-center col-4">
+                            {compareData? (
+                                <ul className="list-group"> {
+                                    companyIds.map(cid => (
+                                        <li className="list-group-item d-flex justify-content-between align-items-center" key={cid}>
+                                            <a className="company-link" href={compareData[cid].company.website} target="_blank">
+                                                <img className="compare-company-logo" src={compareData[cid].company.logo} draggable="false" />
+                                                <span className="compare-company-name">{compareData[cid].company.name}</span>
+                                            </a>
+                                            <span className="badge badge-success badge-pill company-touchpoints-count">{compareData[cid].messages.length} TouchPoints</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div className="single-company-touchpoint">
+                                    <span id="t_count">{totalCount}</span>
+                                    <br />
+                                    <span className="text">TOUCHPOINTS</span>
+                                    <br />
+                                </div>
+                            )}
+                            <span className="date-range">{`${startDate} - ${endDate}`}</span>
                         </div>
-                        <div className="week-chart col-9">
+                        <div className="week-chart align-self-center col-8">
                             <WeekChart messages={messages} compareMessages={compareMessages} companyIds={companyIds}/>
                         </div>
                     </div>
