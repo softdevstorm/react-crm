@@ -27,16 +27,18 @@ const SubHeader = (props) => {
 
     const opencompareCompaniesModal = () => {
         setShowModal(true);
+        let accountCompanies = localStorage.getItem('accountCompanies');
+        setCompanies(JSON.parse(accountCompanies));
         // let tempIdsOfSelectedCompanies = [];
         // tempIdsOfSelectedCompanies.push(companyId);
         // setSelectedCompanyIds(tempIdsOfSelectedCompanies);
-        const accountId = getProfile().id;
-        getCompanies(accountId)
-        .then(data => {
-            setCompanies(data.data.companies);
-        }).catch(error => {
-            console.log(error)
-        })
+        // const accountId = getProfile().id;
+        // getCompanies(accountId)
+        // .then(data => {
+        //     setCompanies(data.data.companies);
+        // }).catch(error => {
+        //     console.log(error)
+        // })
     }
 
     const addCompareCompany = () => {
@@ -74,7 +76,7 @@ const SubHeader = (props) => {
             data = JSON.parse(data)
             if (data.status === 'success') {
                 dispatch(setCompareData(data.data.data));
-                dispatch(setCompareCompanyIds(selectedCompanyIds));
+                dispatch(setCompareCompanyIds(apiData));
                 hideModal();
             } else {
                 console.log(data.message);

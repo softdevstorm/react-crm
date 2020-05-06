@@ -7,7 +7,9 @@ import WeekChart from '../../lib/charts/weekbarchart';
 import DayWeekChart from '../../lib/charts/day-week-chart';
 import DayWeekCompareChart from '../../lib/charts/day-week-compare-chart';
 import CategoryChart from '../../lib/charts/category-chart';
+import CategoryCompareChart from '../../lib/charts/category-compare-chart';
 import PromotionChart from '../../lib/charts/promotion-chart';
+import PromotionCompareChart from '../../lib/charts/promotion-compare-chart';
 import SlickSliderWithImage from '../../lib/utils/slick-slider';
 import { setCompany } from '../../lib/store/action/filter';
 
@@ -97,12 +99,20 @@ const OverView = (props) => {
                         </div>
                         <div className="col-4">
                             <div className="apex-chart">
-                                <CategoryChart messages={messages} />
+                                {companyIds.length > 0? (
+                                    <CategoryCompareChart compareMessages={compareMessages} companyIds={companyIds} />
+                                ) : (
+                                    <CategoryChart messages={messages} />
+                                )}                           
                             </div>
                         </div>
                         <div className="col-4">
                             <div className="apex-chart">
-                                <PromotionChart messages={messages} />
+                                {companyIds.length > 0? (
+                                    <PromotionCompareChart compareMessages={compareMessages} companyIds={companyIds} />
+                                ) : (
+                                    <PromotionChart messages={messages} />
+                                )}
                             </div>
                         </div>
                     </div>
