@@ -60,13 +60,12 @@ const OverView = (props) => {
         }
     }, [year, week, companyId, customerGroupId])
 
-    // React.useEffect(() => {
-    //     setCompareMessages(compareData);
-    // }, [compareData])
-
     React.useEffect(() => {
-        setCompanyIds(compareCompanyIds);
-        setCompareMessages(compareData);
+        if (compareCompanyIds) {
+            setCompanyIds(compareCompanyIds);
+            setCompareMessages(compareData);
+            setDataAvailable(true);
+        }
     }, [compareCompanyIds])
 
     return (

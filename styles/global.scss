@@ -280,12 +280,12 @@ img {
         padding: 10px 0;
         display: flex;
         .compare {
-            padding: 0 5px;
+            padding: 0 3px;
         }
         .compnay-logo {
             
             img.logo {
-                width: 80px;
+                width: 70px;
                 height: 40px;
                 object-fit: scale-down;
                 box-shadow: 0 0 1px 0px #676767;
@@ -295,6 +295,7 @@ img {
         }
         .compare-text {
             padding-top: 10px;
+            font-size: 12px;
         }
         .compare-btn-container {
             padding: 2px 5px;

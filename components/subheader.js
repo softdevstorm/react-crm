@@ -8,7 +8,7 @@ import { getCompanies, getCustomerGroups, getCompareMessages } from '../lib/api'
 import { setCompareData, setCompareCompanyIds } from '../lib/store/action/filter';
 
 const SubHeader = (props) => {
-    const {companyId, company, week, year, compareData, compareCompanyIds, dispatch} = props;
+    const {companyId, customerGroupId, company, week, year, compareData, compareCompanyIds, dispatch} = props;
     const router = useRouter()
     const pathName = router.pathname.replace('/', '');
     const [showModal, setShowModal] = useState(false);
@@ -20,25 +20,18 @@ const SubHeader = (props) => {
     // const [selectedCompareCompanies, setSelectedCompareCompanies] = useState([]);
     
     React.useEffect(() => {
-        // let tempIdsOfSelectedCompanies = [...selectedCompanyIds];
-        // tempIdsOfSelectedCompanies.push(companyId);
-        // setSelectedCompanyIds(tempIdsOfSelectedCompanies);
-    }, [companyId])
+        if (compareData) {
+            dispatch(setCompareData(null));
+            dispatch(setCompareCompanyIds(null));
+        }
+    }, [companyId, customerGroupId, week, year])
 
     const opencompareCompaniesModal = () => {
         setShowModal(true);
         let accountCompanies = localStorage.getItem('accountCompanies');
         setCompanies(JSON.parse(accountCompanies));
-        // let tempIdsOfSelectedCompanies = [];
-        // tempIdsOfSelectedCompanies.push(companyId);
-        // setSelectedCompanyIds(tempIdsOfSelectedCompanies);
-        // const accountId = getProfile().id;
-        // getCompanies(accountId)
-        // .then(data => {
-        //     setCompanies(data.data.companies);
-        // }).catch(error => {
-        //     console.log(error)
-        // })
+        setSelectedCompanyIds([]);
+        // dispatch(setCompareData(null));
     }
 
     const addCompareCompany = () => {
@@ -68,10 +61,12 @@ const SubHeader = (props) => {
     }
 
     const compareCompanyData = () => {
+        dispatch(setCompareData(null));
+        dispatch(setCompareCompanyIds(null));
         let apiData = [...selectedCompanyIds];
         apiData.unshift(companyId);
         const accountId = getProfile().id;
-        getCompareMessages(accountId, apiData, week, year)
+        getCompareMessages(accountId, apiData, customerGroupId, week, year)
         .then(data => {
             data = JSON.parse(data)
             if (data.status === 'success') {
@@ -89,11 +84,13 @@ const SubHeader = (props) => {
 
     const hideModal = () => {
         setShowModal(false);
-        setSelectedCompanyIds([]);
         setcompareCompanies([]);
         setSelectCompany(false);
-        setSelectedCompanyIds([]);
+        // setSelectedCompanyIds([]);
     }
+
+    console.log(compareData);
+    console.log(compareCompanyIds);
 
     return (
         <div className="row sub-top-bar">
@@ -106,7 +103,20 @@ const SubHeader = (props) => {
                                     <img className="logo" src={company.logo} />
                                 </a>
                             </div>
-                            <div className="compare-text compare">VS</div>
+                            {compareCompanyIds? (
+                                compareCompanyIds.map(compareCompanyId => (
+                                    compareCompanyId !== companyId? (
+                                        <React.Fragment key={compareCompanyId}>
+                                            <div className="compare-text compare">VS</div>
+                                            <div className="compnay-logo compare">
+                                                <a href={compareData[compareCompanyId].company.website} target="_blank">
+                                                    <img className="logo" src={compareData[compareCompanyId].company.logo} />
+                                                </a>
+                                            </div>
+                                        </React.Fragment>
+                                    ) : (null)
+                                ))
+                            ) : (null)}
                             <div className="compare-btn-container">
                                 <Button variant="success" onClick={() => opencompareCompaniesModal()}>Compare</Button>{' '}
                             </div>
@@ -186,6 +196,7 @@ const mapStateToProps = (state) => {
         week: state.filter.week,
         year: state.filter.year,
         companyId: state.filter.companyId,
+        customerGroupId: state.filter.customerGroupId,
         company: state.filter.company,
         compareData: state.filter.compareData,
         compareCompanyIds: state.filter.compareCompanyIds
