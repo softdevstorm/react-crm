@@ -26,6 +26,7 @@ const OverView = (props) => {
     const [totalCount, setTotalCount] = React.useState('');
     const [compareMessages, setCompareMessages] = React.useState([]);
     const [companyIds, setCompanyIds] = React.useState([]);
+    const [slickSliderMessages, setSlickSliderMessages] = React.useState([]);
 
     React.useEffect(() => {
         const id = getProfile().id;
@@ -34,6 +35,7 @@ const OverView = (props) => {
 
     React.useEffect(() => {
         setCompanyIds([]);
+        setSlickSliderMessages(messages);
     }, [messages])
 
     React.useEffect(() => {
@@ -66,6 +68,14 @@ const OverView = (props) => {
         if (compareCompanyIds) {
             setCompanyIds(compareCompanyIds);
             setCompareMessages(compareData);
+            let sliderMessages = []
+            Object.keys(compareData).map((key) => {
+                compareData[key].messages.forEach(function(message) {
+                    sliderMessages.push(message);
+                })
+            });
+            localStorage.setItem('messages', JSON.stringify(sliderMessages));
+            setSlickSliderMessages(sliderMessages)
             setDataAvailable(true);
         }
     }, [compareCompanyIds])
@@ -136,7 +146,7 @@ const OverView = (props) => {
                         </div>
                     </div>
                     <div className="slick-slider-image">
-                        <SlickSliderWithImage messages={messages} />
+                        <SlickSliderWithImage slickSliderMessages={slickSliderMessages} />
                     </div>
                 </div>
             ) : (

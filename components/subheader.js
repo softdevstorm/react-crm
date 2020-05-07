@@ -32,7 +32,8 @@ const SubHeader = (props) => {
         setSelectedCompanyIds([]);
     }
 
-    const addCompareCompany = () => {
+    const addCompareCompany = (e) => {
+        e.preventDefault();
         const tempCom = companies.filter(company => !selectedCompanyIds.includes(company.id) && company.id != 0 && company.id != companyId);
         setcompareCompanies(tempCom);
         setSelectCompany(true);
@@ -173,7 +174,7 @@ const SubHeader = (props) => {
                                 )
                             })}
                             <div className="add-company-link">
-                                <a href="#" onClick={() => addCompareCompany()}>Add New Company to Compare</a>
+                                <a href="#" onClick={(event) => addCompareCompany(event)}>Add New Company to Compare</a>
                             </div>
                         </Col>
                         <Col className="col-4 select-companies">
