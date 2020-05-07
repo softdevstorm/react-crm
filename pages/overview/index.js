@@ -6,6 +6,7 @@ import { getData } from '../../lib/api';
 import { getProfile } from '../../lib/auth';
 import WeekChart from '../../lib/charts/weekbarchart';
 import DayWeekChart from '../../lib/charts/day-week-chart';
+import WeekCompareChart from '../../lib/charts/week-compare-chart';
 import DayWeekCompareChart from '../../lib/charts/day-week-compare-chart';
 import CategoryChart from '../../lib/charts/category-chart';
 import CategoryCompareChart from '../../lib/charts/category-compare-chart';
@@ -76,14 +77,14 @@ const OverView = (props) => {
                     <div className="weekchart-container">
                         <div className="touchpoint-counts align-self-center col-4">
                             {compareData? (
-                                <ul className="list-group"> {
-                                    companyIds.map(cid => (
-                                        <li className="list-group-item d-flex justify-content-between align-items-center" key={cid}>
-                                            <a className="company-link" href={compareData[cid].company.website} target="_blank">
-                                                <img className="compare-company-logo" src={compareData[cid].company.logo} draggable="false" />
-                                                <span className="compare-company-name">{compareData[cid].company.name}</span>
+                                <ul className="list-group">
+                                    {Object.keys(compareData).map(key => (
+                                        <li className="list-group-item d-flex justify-content-between align-items-center" key={key}>
+                                            <a className="company-link" href={compareData[key].company.website} target="_blank">
+                                                <img className="compare-company-logo" src={compareData[key].company.logo} draggable="false" />
+                                                <span className="compare-company-name">{compareData[key].company.name}</span>
                                             </a>
-                                            <span className="badge badge-success badge-pill company-touchpoints-count">{compareData[cid].messages.length} TouchPoints</span>
+                                            <span className="badge badge-success badge-pill company-touchpoints-count">{compareData[key].messages.length > 1? `${compareData[key].messages.length} Touchpoints`: `${compareData[key].messages.length} Touchpoint`}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -98,7 +99,11 @@ const OverView = (props) => {
                             <span className="date-range">{`${startDate} - ${endDate}`}</span>
                         </div>
                         <div className="week-chart align-self-center col-8">
-                            <WeekChart messages={messages} compareMessages={compareMessages} companyIds={companyIds}/>
+                            {companyIds.length > 0? (
+                                <WeekCompareChart compareMessages={compareMessages} companyIds={companyIds} />
+                            ) : (
+                                <WeekChart messages={messages} />
+                            )}
                         </div>
                     </div>
                     <div className="multi-chart-container">

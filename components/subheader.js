@@ -103,7 +103,6 @@ const SubHeader = (props) => {
         setShowModal(false);
         setcompareCompanies([]);
         setSelectCompany(false);
-        // setSelectedCompanyIds([]);
     }
 
     return (
