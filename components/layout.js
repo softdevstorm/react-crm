@@ -16,16 +16,17 @@ const Layout = ({
     }) => {
     const router = useRouter()
     const pathName = router.pathname.replace('/', '');
-    const [user, setUser] = React.useState({})
+    const account = getProfile();
+    const user = {
+        user_id: account.id,
+        email: account.email,
+        name: `${account.forename} ${account.surname}`,
+        created_at: Date.parse(account.created_at),
+    }
 
-    React.useEffect(() => {
-        const account = getProfile();
-        setUser({
-            user_id: account.id,
-            email: account.email,
-            name: account.forename + account.surname
-        })
-    }, [])
+    const ReactIntercom = React.lazy(() =>
+        import('react-intercom').then(module => ({ default: module.ReactIntercom }))
+    );
 
     return (
         <main className="mainContainer">
@@ -83,9 +84,11 @@ const Layout = ({
                     <Footer />
                 </div>
             </div>
-            <div className="app-intercom">
-                <Intercom appID="oea04gat" user={user} />
-            </div>
+            <Intercom
+                open
+                appID="oea04gat"
+                user={user}
+                />
         </main>
     );
 };
