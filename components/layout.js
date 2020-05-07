@@ -1,12 +1,14 @@
 import React, { useEffect } from "react";
 import { useRouter } from 'next/router'
 import Head from "next/head";
+import Intercom from 'react-intercom';
 import generalRoute from "./generalRoute"
 import SideBar from "./sidebar";
 import Header from "./header";
 import SubHeader from "./subheader";
 import UserHeader from "./userheader";
 import Footer from "./footer";
+import { getProfile } from '../lib/auth';
 
 const Layout = ({
         children,
@@ -14,6 +16,16 @@ const Layout = ({
     }) => {
     const router = useRouter()
     const pathName = router.pathname.replace('/', '');
+    const [user, setUser] = React.useState({})
+
+    React.useEffect(() => {
+        const account = getProfile();
+        setUser({
+            user_id: account.id,
+            email: account.email,
+            name: account.forename + account.surname
+        })
+    }, [])
 
     return (
         <main className="mainContainer">
@@ -67,10 +79,12 @@ const Layout = ({
                 <div className="content">
                     <div className="container">
                         {children}
-                        {/* {React.cloneElement(children, { value: 'sss', anotherMessage: 'sdgsdgasgs' })} */}
                     </div>
                     <Footer />
                 </div>
+            </div>
+            <div className="app-intercom">
+                <Intercom appID="oea04gat" user={user} />
             </div>
         </main>
     );

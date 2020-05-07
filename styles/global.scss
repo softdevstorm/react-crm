@@ -194,6 +194,10 @@ img {
         height: 35px;
     }
 
+    .dropdown-item.denied-permission {
+        font-weight: 300;
+    }
+
     .dropdown .dropdown-toggle {
         height: 40px;
     }
@@ -225,6 +229,12 @@ img {
         padding: 5px;
         margin-top: 5px;
     }
+
+}
+
+.permission-modal.modal-header {
+    color: #212529;
+    background-color: #ffc107;
 }
 
 // sub header style

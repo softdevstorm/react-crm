@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { DropdownButton, Dropdown } from 'react-bootstrap';
+import { DropdownButton, Dropdown, Modal, Button } from 'react-bootstrap';
 import OpenMessageModal from './messageModal';
-import { logOut } from '../lib/auth';
+import { logOut, getProfile } from '../lib/auth';
+import { getAccountChannel } from '../lib/api';
 
 const Header = () => {
 
@@ -41,6 +42,38 @@ const Header = () => {
         }
     ]
 
+    const [accountChannle, setAccountChannel] = useState([]);
+    const [clickedChannelName, setClickedChannelName] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+
+    React.useEffect(() => {
+        const channel = localStorage.getItem('accountChannel');
+        if (channel) {
+            setAccountChannel(JSON.parse(channel));
+        } else {
+            const accountId = getProfile().id;
+            getAccountChannel(accountId)
+            .then(res => {
+                console.log(res)
+                localStorage.setItem('accountChannel', JSON.stringify(res.data));
+                setAccountChannel(res.data);
+            })
+            .catch(error => {
+                console.log(error);
+            })
+        }
+    }, [])
+
+    const showPermissionModal = (e) => {
+        const channelName = e.target.text;
+        setClickedChannelName(channelName);
+        setShowModal(true);
+    }
+
+    const closeModal = () => {
+        setShowModal(false);
+    }
+
     return (
         <React.Fragment>
             <nav className="row top-header">
@@ -55,7 +88,11 @@ const Header = () => {
                             <li className="nav-item">
                                 <DropdownButton id="dropdown-basic-button" title="Competition">
                                     {competitionDropDownList.map(item => (
-                                        <Dropdown.Item href="#" key={item.name}>{item.title}</Dropdown.Item>
+                                        accountChannle[item.name]? (
+                                            <Dropdown.Item href={accountChannle[item.name].link} key={item.name}>{item.title}</Dropdown.Item>                                            
+                                        ) : (
+                                            <Dropdown.Item href="#" key={item.name} className="denied-permission" onClick={(e) => showPermissionModal(e)}>{item.title}</Dropdown.Item>
+                                        )
                                     ))}
                                 </DropdownButton>
                             </li>
@@ -78,6 +115,17 @@ const Header = () => {
                         <a href="/user/account" className="nav-profile-link float-right mr-3"><img src="/images/user-icon.png" /></a>
                     </div>
                 </div>
+                <Modal show={showModal} size="lg" onHide={closeModal}>
+                    <Modal.Header className="permission-modal" closeButton>
+                        <Modal.Title>Permission Denied</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>You currently do not have permission to enter the channel page {clickedChannelName}. For accessing it, please get in touch.</Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="warning" onClick={closeModal}>
+                            Close
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </nav>
             <OpenMessageModal></OpenMessageModal>
         </React.Fragment>
