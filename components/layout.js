@@ -84,11 +84,11 @@ const Layout = ({
                     <Footer />
                 </div>
             </div>
-            <Intercom
+            {/* <Intercom
                 open
                 appID="oea04gat"
                 user={user}
-                />
+                /> */}
         </main>
     );
 };

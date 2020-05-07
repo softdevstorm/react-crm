@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { connect } from "react-redux";
 import DatePicker from "react-datepicker";
 import Select from 'react-select';
-import { weekListOption, yearListOption, getWeekNumber, getYear, formatDate, getCurrentDate } from '../lib/utils/date';
+import { weekListOption, yearListOption, getWeekNumber, getYear, formatDate, getCurrentDate, getStartDate } from '../lib/utils/date';
 import { getCompanies, getCustomerGroups } from '../lib/api';
 import { getProfile } from '../lib/auth';
 
@@ -165,13 +165,15 @@ const FilterByDateCmp = (props) => {
     const pathName = router.pathname.replace('/', '');
 
     const [accountId, setAccountId] = React.useState('')
+    const [accountCompanies, setAccountCompanies] = React.useState([]);
+    const [accountCustomerGroups, setAccountCustomerGroups] = React.useState([]);
     const [companyOptions, setCompanyOptions] = React.useState([])
     const [customerGroupOptions, setCustomerGroupOptions] = React.useState([])
 
     const [selectedCompany, setCompany] = React.useState({company_id: null})
     const [selectedCustomerGroup, setCustomerGroup] = React.useState({customer_group_id: null})
 
-    const [selectedStartDate, setSelectedStartDate] = React.useState(getYear() + '-01-01');
+    const [selectedStartDate, setSelectedStartDate] = React.useState(getStartDate());
     const [selectedEndDate, setSelectedEndDate] = React.useState(getCurrentDate());
 
     const {companyId, customerGroupId, startDate, endDate, dispatch} = props;
@@ -181,37 +183,61 @@ const FilterByDateCmp = (props) => {
         setAccountId(accountId);
 
         // get all companies for account
+        if (localStorage.getItem('accountCompanies') === null) {
+            getCompanies(accountId)
+            .then(data => {
+                const companyData = data.data.companies;
+                localStorage.setItem('accountCompanies', JSON.stringify(companyData));
+                setAccountCompanies(companyData)
+            }).catch(error => {
+                console.log(error)
+            })
+        } else {
+            setAccountCompanies(JSON.parse(localStorage.getItem('accountCompanies')))
+        }
+
+        // get all customer groups for account
+        if (localStorage.getItem('accountCustomerGroups') === null) {
+            getCustomerGroups(accountId)
+            .then(data => {
+                const customerGroupData = data.data.customer_group;
+                localStorage.setItem('accountCustomerGroups', JSON.stringify(customerGroupData));
+                setAccountCustomerGroups(customerGroupData)
+            }).catch(error => {
+                console.log(error)
+            })
+        } else {
+            setAccountCustomerGroups(JSON.parse(localStorage.getItem('accountCustomerGroups')))
+        }
+
+    }, [])
+
+    React.useEffect(() => {
+        
         const tempCompanyOptions = [];
-        getCompanies(accountId)
-        .then(data => {            
-            const companyData = data.data.companies;
-            companyData.map(company => {
+        if (accountCompanies) {
+            accountCompanies.map(company => {
                 let companyOption = {}
                 companyOption['value'] = company.id;
                 companyOption['label'] = company.name;
                 tempCompanyOptions.push(companyOption)
+                setCompanyOptions(tempCompanyOptions)
             })
-            setCompanyOptions(tempCompanyOptions)
-        }).catch(error => {
-            console.log(error)
-        })
-        
-        // get all customer groups for account
+        }
+    }, [accountCompanies])
+
+    React.useEffect(() => {
         const tempCustomerGroupOptions = [];
-        getCustomerGroups(accountId)
-        .then(data => {
-            const customerGroupData = data.data.customer_group;
-            customerGroupData.map(customerGroupd => {
+        if (accountCustomerGroups) {
+            accountCustomerGroups.map(customerGroupd => {
                 let customerGroupOption = {}
                 customerGroupOption['value'] = customerGroupd.id;
                 customerGroupOption['label'] = customerGroupd.name;
                 tempCustomerGroupOptions.push(customerGroupOption)
             })
             setCustomerGroupOptions(tempCustomerGroupOptions)
-        }).catch(error => {
-            console.log(error)
-        })
-    }, [])
+        }
+    }, [accountCustomerGroups])
 
     let handleChange = (value, type) => {
         if ( type === 'company' ) {
