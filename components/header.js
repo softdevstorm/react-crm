@@ -72,7 +72,7 @@ const Header = () => {
                         </ul>
                     </div>
                     <div className="col-md-3">
-                        <a href="/" onClick={()=>logOut()} className="logout float-right">
+                        <a href="#" onClick={(event)=>logOut(event)} className="logout float-right">
                             <i className="fa fa-sign-out fa-lg"></i>
                         </a>
                         <a href="/user/account" className="nav-profile-link float-right mr-3"><img src="/images/user-icon.png" /></a>
