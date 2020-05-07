@@ -46,13 +46,49 @@ class MyApp extends App {
   constructor (props) {
     super(props)
     this.store = initStore(reducer, props.initialState, props.isServer)
+    this.state = ({loaded: false})
+
+  }
+
+  componentWillUnmount() {
+    this.routeStart();
+    Router.events.off('routeChangeStart', () => this.routeStart());
+    Router.events.off('routeChangeComplete', () => this.routeEnd());
+  }
+
+  componentDidMount() {
+    this.routeEnd();
+    Router.events.on('routeChangeStart', () => this.routeStart());
+    Router.events.on('routeChangeComplete', () => this.routeEnd());
+  }
+
+  routeStart() {
+    this.setState({loaded: false});
+  }
+
+  routeEnd() {
+    setTimeout(
+      function() {
+        this.setState({loaded: true});
+      }
+      .bind(this),
+      1500
+    );
   }
 
   render() {
       const {Component, pageProps} = this.props;
       return (
         <Provider store={this.store}>
-          <Component {...pageProps} />
+          <>
+            {!this.state.loaded ? (
+              <div className="page-loading">
+                <img src="/images/page-loading.gif" alt="..." />
+              </div>
+            ) : (
+              <Component {...pageProps} />
+            )}
+          </>
         </Provider>
       );
   }
@@ -60,38 +96,3 @@ class MyApp extends App {
 }
 
 export default MyApp;
-
-// export default function App({ Component, pageProps }) {
-//   return <Component {...pageProps} />
-// }
-
-// export default function App({ Component, pageProps }) {
-//   const [loading, setLoading] = React.useState(false);
-//   React.useEffect(() => {
-//     const start = () => {
-//       console.log("start");
-//       setLoading(true);
-//     };
-//     const end = () => {
-//       console.log("findished");
-//       setLoading(false);
-//     };
-//     Router.events.on("routeChangeStart", start);
-//     Router.events.on("routeChangeComplete", end);
-//     Router.events.on("routeChangeError", end);
-//     return () => {
-//       Router.events.off("routeChangeStart", start);
-//       Router.events.off("routeChangeComplete", end);
-//       Router.events.off("routeChangeError", end);
-//     };
-//   }, []);
-//   return (
-//     <>
-//       {loading ? (
-//         <h1>Loading...</h1>
-//       ) : (
-//         <Component {...pageProps} />
-//       )}
-//     </>
-//   );
-// }
